@@ -1,8 +1,7 @@
 #include <ESP8266WiFi.h> // Importa a Biblioteca ESP8266WiFi
 #include <PubSubClient.h> // Importa a Biblioteca PubSubClient
- 
-//defines:
-//defines de id mqtt e tópicos para publicação e subscribe
+
+//id mqtt e tópicos para publicação e subscribe
 #define TOPICO_SUBSCRIBE "MQTTRoboIoTCaioValenteEnvia"     //tópico MQTT de escuta
 #define TOPICO_PUBLISH   "MQTTRoboIoTCaioValenteRecebe"    //tópico MQTT de envio de informações para Broker
 #define ID_MQTT  "RoboIotCaioValente01"    //id mqtt (para identificação de sessão)
@@ -11,7 +10,7 @@
                                            //            id de outro já conectado ao broker, o broker 
                                            //            irá fechar a conexão de um deles).
  
-//defines - mapeamento de pinos do NodeMCU
+//mapeamento de pinos do NodeMCU
 #define D0    16
 #define D1    5
 #define D2    4
@@ -24,13 +23,13 @@
 #define D9    3
 #define D10   1
  
-//defines - motores
+//motores
 #define MOTOR_DIRETO     D0
 #define MOTOR_ESQUERDO   D1
  
 // WIFI
-const char* SSID = "valenteC";     //Coloque aqui o SSID / nome da rede WI-FI que deseja se conectar
-const char* PASSWORD = "31932959"; //Coloque aqui a senha da rede WI-FI que deseja se conectar
+const char* SSID = "REDEAQUI";     //Coloque aqui o SSID / nome da rede WI-FI que deseja se conectar
+const char* PASSWORD = "SENHAAQUI"; //Coloque aqui a senha da rede WI-FI que deseja se conectar
   
 // MQTT
 const char* BROKER_MQTT = "iot.eclipse.org"; //URL do broker MQTT que se deseja utilizar
@@ -42,7 +41,7 @@ PubSubClient MQTT(espClient); // Instancia o Cliente MQTT passando o objeto espC
 char EstadoMotorDireto = '0';  //variável que armazena o estado atual do motor da direita
 char EstadoMotorEsquerdo = '0';  //variável que armazena o estado atual do motor da esquerda
   
-//Prototypes
+//Prototipos
 void initSerial();
 void initWiFi();
 void initMQTT();
@@ -63,18 +62,14 @@ void setup()
     initMQTT();
 }
   
-//Função: inicializa comunicação serial com baudrate 115200 (para fins de monitorar no terminal serial 
-//        o que está acontecendo.
-//Parâmetros: nenhum
-//Retorno: nenhum
+//inicializa comunicação serial com baudrate 115200 (para fins de monitorar no terminal serial o que está acontecendo.)
 void initSerial() 
 {
     Serial.begin(115200);
 }
  
-//Função: inicializa e conecta-se na rede WI-FI desejada
-//Parâmetros: nenhum
-//Retorno: nenhum
+//inicializa e conecta-se na rede WI-FI desejada
+
 void initWiFi() 
 {
     delay(10);
@@ -86,21 +81,15 @@ void initWiFi()
     reconectWiFi();
 }
   
-//Função: inicializa parâmetros de conexão MQTT(endereço do 
-//        broker, porta e seta função de callback)
-//Parâmetros: nenhum
-//Retorno: nenhum
+//inicializa parâmetros de conexão MQTT(endereço do broker, porta e seta função de callback)
 void initMQTT() 
 {
     MQTT.setServer(BROKER_MQTT, BROKER_PORT);   //informa qual broker e porta deve ser conectado
     MQTT.setCallback(mqtt_callback);            //atribui função de callback (função chamada quando qualquer informação de um dos tópicos subescritos chega)
 }
   
-//Função: função de callback 
-//        esta função é chamada toda vez que uma informação de 
-//        um dos tópicos subescritos chega)
-//Parâmetros: nenhum
-//Retorno: nenhum
+//função de callback esta função é chamada toda vez que uma informação de um dos tópicos subescritos chega
+
 void mqtt_callback(char* topic, byte* payload, unsigned int length) 
 {
     String msg;
@@ -162,10 +151,7 @@ void mqtt_callback(char* topic, byte* payload, unsigned int length)
     }
 }
   
-//Função: reconecta-se ao broker MQTT (caso ainda não esteja conectado ou em caso de a conexão cair)
-//        em caso de sucesso na conexão ou reconexão, o subscribe dos tópicos é refeito.
-//Parâmetros: nenhum
-//Retorno: nenhum
+//reconecta-se ao broker MQTT (caso ainda não esteja conectado ou em caso de a conexão cair) em caso de sucesso na conexão ou reconexão, o subscribe dos tópicos é refeito.
 void reconnectMQTT() 
 {
     while (!MQTT.connected()) 
@@ -186,9 +172,7 @@ void reconnectMQTT()
     }
 }
   
-//Função: reconecta-se ao WiFi
-//Parâmetros: nenhum
-//Retorno: nenhum
+//reconecta-se ao WiFi
 void reconectWiFi() 
 {
     //se já está conectado a rede WI-FI, nada é feito. 
@@ -211,11 +195,7 @@ void reconectWiFi()
     Serial.println(WiFi.localIP());
 }
  
-//Função: verifica o estado das conexões WiFI e ao broker MQTT. 
-//        Em caso de desconexão (qualquer uma das duas), a conexão
-//        é refeita.
-//Parâmetros: nenhum
-//Retorno: nenhum
+//verifica o estado das conexões WiFI e ao broker MQTT. Em caso de desconexão (qualquer uma das duas), a conexão é refeita.
 void VerificaConexoesWiFIEMQTT(void)
 {
     if (!MQTT.connected()) 
@@ -224,9 +204,7 @@ void VerificaConexoesWiFIEMQTT(void)
      reconectWiFi(); //se não há conexão com o WiFI, a conexão é refeita
 }
  
-//Função: envia ao Broker o estado atual do output 
-//Parâmetros: nenhum
-//Retorno: nenhum
+//nvia ao Broker o estado atual do output 
 void EnviaEstadoOutputMQTT(void)
 {
     char EstadosMotores[3];
@@ -240,9 +218,7 @@ void EnviaEstadoOutputMQTT(void)
     delay(1000);
 }
  
-//Função: inicializa os outputs em nível lógico baixo (desliga os dois motores)
-//Parâmetros: nenhum
-//Retorno: nenhum
+//inicializa os outputs em nível lógico baixo (desliga os dois motores)
 void InitOutputs(void)
 {
     pinMode(MOTOR_DIRETO, OUTPUT);
